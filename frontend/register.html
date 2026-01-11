@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Crop Marketplace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .register-container {
+      background: white;
+      padding: 35px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .register-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2e7d32;
+    }
+
+    .role-select {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+
+    .role-btn {
+      flex: 1;
+      margin: 0 6px;
+      padding: 10px;
+      border: 2px solid #2e7d32;
+      background: white;
+      color: #2e7d32;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .role-btn.active, .role-btn:hover {
+      background: #2e7d32;
+      color: white;
+    }
+
+    .form-group {
+      margin: 15px 0;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 14px;
+      color: #37474f;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      background: #1b5e20;
+    }
+
+    .login-link {
+      margin-top: 15px;
+      display: block;
+      text-align: center;
+      font-size: 14px;
+      color: #37474f;
+    }
+
+    .login-link a {
+      color: #2e7d32;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2><i class="fa-solid fa-leaf"></i> Create Account</h2>
+    <div class="role-select">
+      <button type="button" class="role-btn active" onclick="selectRole(event, 'farmer')">Farmer</button>
+      <button type="button" class="role-btn" onclick="selectRole(event, 'buyer')">Buyer</button>
+    </div>
+
+    <form id="registerForm">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="Enter your name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="Enter your email" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Create a password" required>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="phone" placeholder="Enter phone number" required>
+      </div>
+
+      <div class="form-group">
+        <label>Country</label>
+        <input type="text" id="country" placeholder="Enter your country" required>
+      </div>
+
+      <div class="form-group">
+        <label>State</label>
+        <input type="text" id="state" placeholder="Enter your state" required>
+      </div>
+
+      <div class="form-group">
+        <label>Village</label>
+        <input type="text" id="village" placeholder="Enter your village" required>
+      </div>
+
+      <div class="form-group hidden" id="farmer-extra">
+        <label>Farm Size (in acres)</label>
+        <input type="text" id="farmSize" placeholder="e.g. 5 acres">
+      </div>
+
+      <button type="submit" class="btn">Register</button>
+    </form>
+
+    <span class="login-link">
+      Already have an account? <a href="login.html">Login</a>
+    </span>
+  </div>
+
+  <script src="js/register.js"></script>
+
+  <script>
+    function selectRole(event, role) {
+      document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      const farmerExtra = document.getElementById('farmer-extra');
+      if (role === 'farmer') {
+        farmerExtra.classList.remove('hidden');
+      } else {
+        farmerExtra.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

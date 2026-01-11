@@ -1,0 +1,21 @@
+<header>
+  <h2>Farmer Dashboard</h2>
+  <div class="profile" onclick="showProfile()">
+    <i class="fa-solid fa-user-circle"></i>
+    <span id="farmerName">Farmer Name</span>
+  </div>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<div id="profileModal" class="hidden" style="
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 10000; width: 300px;
+">
+  <h3>Profile Info</h3>
+  <p><strong>Name:</strong> <span id="profileName">Farmer Name</span></p>
+  <p><strong>Email:</strong> <span id="profileEmail">farmer@example.com</span></p>
+  <p><strong>State:</strong> <span id="profileState">Maharashtra</span></p>
+  <p><strong>Village:</strong> <span id="profileVillage">Pune</span></p>
+  <button class="btn back-btn" onclick="closeProfile()">Close</button>
+</div>

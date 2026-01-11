@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farmer Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body { font-family: 'Poppins', sans-serif; background: #f4f8f5; margin:0; padding:0; }
+header { background:#2e7d32; color:white; padding:15px 20px; display:flex; justify-content:space-between; align-items:center; position:relative; }
+header h2 { margin:0; }
+.header-right { display:flex; align-items:center; gap:15px; }
+.profile { display:flex; align-items:center; cursor:pointer; }
+.profile i { font-size:28px; margin-right:10px; }
+button { background:#e53935; border:none; padding:8px 16px; border-radius:6px; color:#fff; cursor:pointer; font-size:14px; transition:background 0.3s; }
+button:hover { background:#c62828; }
+.container { padding:20px; }
+.btn { background:#2e7d32; color:white; border:none; padding:12px 20px; margin:10px; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
+.btn:hover { background:#1b5e20; }
+.back-btn { background:#757575; }
+.hidden { display:none; }
+.card { background:white; padding:15px; margin:10px 0; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); display:flex; justify-content:space-between; align-items:center; }
+form input, form textarea { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px; }
+form label { font-weight:600; margin-top:10px; display:block; }
+.scrollable { max-height:400px; overflow-y:auto; padding-right:5px; }
+.success-msg { color:green; font-weight:600; margin-top:10px; }
+#profileInfo { position:absolute; top:60px; right:20px; background:white; padding:15px; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.2); width:250px; z-index:10000; }
+</style>
+</head>
+<body>
+
+<header>
+  <h2>Farmer Dashboard</h2>
+  <div class="header-right">
+    <div class="profile" onclick="toggleProfile()">
+      <i class="fa-solid fa-user-circle"></i>
+      <span id="farmerName">Farmer Name</span>
+    </div>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div id="profileInfo" class="hidden">
+  <p><strong>Name:</strong> <span id="profileName"></span></p>
+  <p><strong>Email:</strong> <span id="profileEmail"></span></p>
+  <p><strong>State:</strong> <span id="profileState"></span></p>
+  <p><strong>Village:</strong> <span id="profileVillage"></span></p>
+</div>
+
+<div class="container">
+  <div id="dashboard">
+    <button class="btn" onclick="showSection('addCrop')">➕ Add Crop</button>
+    <button class="btn" onclick="showSection('uploads')">📦 My Uploads</button>
+    <button class="btn" onclick="showSection('requests')">📨 Buyer Requests</button>
+  </div>
+
+  <div id="addCrop" class="hidden">
+    <h3>Add New Crop</h3>
+    <form id="addCropForm">
+      <label for="crop">Crop Name</label>
+      <input type="text" id="crop" placeholder="e.g. Tomatoes" required>
+      <label for="qty">Quantity</label>
+      <input type="text" id="qty" placeholder="e.g. 100kg" required>
+      <label for="price">Price (per kg)</label>
+      <input type="number" id="price" placeholder="e.g. 50" required>
+      <label for="details">Additional Details</label>
+      <textarea id="details" rows="3" placeholder="e.g. Organic, freshly harvested"></textarea>
+      <button type="submit" class="btn">Save Crop</button>
+      <button type="button" class="btn back-btn" onclick="goBack()">⬅ Back</button>
+    </form>
+  </div>
+
+  <div id="uploads" class="hidden">
+    <h3>My Uploaded Crops</h3>
+    <div class="scrollable" id="uploadsList"></div>
+    <button class="btn back-btn" onclick="goBack()">⬅ Back</button>
+  </div>
+
+  <div id="requests" class="hidden">
+    <h3>Requests from Buyers</h3>
+    <div class="scrollable" id="requestsList"></div>
+    <button class="btn back-btn" onclick="goBack()">⬅ Back</button>
+  </div>
+
+</div>
+<script>
+const API_URL = "http://localhost:3000/api";
+const user = JSON.parse(localStorage.getItem("user"));
+const token = localStorage.getItem("token");
+
+if (!user || !token) window.location.href = "login.html";
+
+document.getElementById("farmerName").textContent = user.name;
+document.getElementById("profileName").textContent = user.name;
+document.getElementById("profileEmail").textContent = user.email;
+document.getElementById("profileState").textContent = user.state;
+document.getElementById("profileVillage").textContent = user.village;
+
+function toggleProfile(){ document.getElementById("profileInfo").classList.toggle("hidden"); }
+function logout(){ localStorage.clear(); window.location.href="login.html"; }
+
+function showSection(sectionId) {
+  document.getElementById("dashboard").classList.add("hidden");
+  document.querySelectorAll('.container > div').forEach(div => div.classList.add("hidden"));
+  document.getElementById(sectionId).classList.remove("hidden");
+
+  if (sectionId === "uploads") fetchFarmerCrops();
+  if (sectionId === "requests") fetchFarmerRequests();
+}
+
+function goBack(){
+  document.querySelectorAll(".container > div").forEach(d=>d.classList.add("hidden"));
+  document.getElementById("dashboard").classList.remove("hidden");
+}
+
+async function fetchFarmerCrops(){
+  const res = await fetch(`${API_URL}/crops/farmer`,{
+    headers:{ Authorization:`Bearer ${token}` }
+  });
+  const data = await res.json();
+  const list=document.getElementById("uploadsList");
+  list.innerHTML="";
+  data.forEach(c=>{
+    list.innerHTML+=`<div class="card"><strong>${c.crop_name}</strong><p>${c.quantity} - ₹${c.price}/kg</p></div>`;
+  });
+}
+
+async function fetchFarmerRequests() {
+  try {
+    const res = await fetch(`${API_URL}/requests/farmer/${user.id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || "Failed to load requests");
+      return;
+    }
+
+    renderFarmerRequests(data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function renderFarmerRequests(requests) {
+  const container = document.getElementById("requestsList");
+  container.innerHTML = "";
+
+  if (requests.length === 0) {
+    container.innerHTML = "<p>No requests found</p>";
+    return;
+  }
+
+  requests.forEach(r => {
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div>
+        <strong>${r.crop_name}</strong>
+        <p>Buyer: ${r.buyer_name}</p>
+        <p>Offered Price: ₹${r.requested_price}</p>
+        <p>
+          Status:
+          <span style="
+            font-weight:600;
+            color:${
+              r.status === 'accepted'
+                ? 'green'
+                : r.status === 'rejected'
+                ? 'red'
+                : '#333'
+            };
+          ">
+            ${r.status}
+          </span>
+        </p>
+
+
+        ${
+          r.status === "pending"
+            ? `
+              <button style="background:green" onclick="updateStatus(${r.id}, 'accepted')">
+                Accept
+              </button>
+              <button style="background:red" onclick="updateStatus(${r.id}, 'rejected')">
+                Reject
+              </button>
+            `
+            : ""
+        }
+
+        <br><br>
+        <a href="#" onclick='showBuyerDetails(${JSON.stringify(r)})'>More details</a>
+      </div>
+    `;
+
+
+    container.appendChild(div);
+  });
+}
+
+function showBuyerDetails(buyer) {
+  alert(
+    "Buyer Details\n\n" +
+    "Name: " + buyer.buyer_name + "\n" +
+    "Country: " + buyer.buyer_country + "\n" +
+    "State: " + buyer.buyer_state + "\n" +
+    "Phone: " + buyer.buyer_phone
+  );
+}
+
+async function updateStatus(requestId, status) {
+  try {
+    const res = await fetch(
+      `${API_URL}/requests/${requestId}/status`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ status })
+      }
+    );
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error);
+      return;
+    }
+
+    alert(data.message);
+    fetchFarmerRequests();
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+document.getElementById("addCropForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const cropData={
+    crop_name:crop.value,
+    quantity:qty.value,
+    price:price.value,
+    details:details.value,
+    state:user.state
+  };
+  const res=await fetch(`${API_URL}/crops`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization":`Bearer ${token}`
+    },
+    body:JSON.stringify(cropData)
+  });
+  if(res.ok){ alert("Crop added successfully"); showSection("uploads"); }
+});
+</script>
+</body>
+</html>

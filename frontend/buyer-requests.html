@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buyer Requests</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+  font-family: 'Poppins', sans-serif;
+  background: #f4f8f5;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+}
+
+h2 {
+  color: #2e7d32;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 30px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 8px 15px;
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+.search-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  padding: 8px;
+}
+.search-bar button {
+  background: none;
+  border: none;
+  color: #2e7d32;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+.filters select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: relative;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-3px);
+}
+.card h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #2e7d32;
+}
+.card p {
+  margin: 6px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 12px;
+  margin-top: 8px;
+  font-weight: 600;
+}
+.status.active { background: #e6f4ea; color: #1b5e20; }
+.status.pending { background: #fff8e1; color: #856404; }
+.status.expired { background: #fdecea; color: #b71c1c; }
+
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #dc3545;
+  font-size: 16px;
+  cursor: pointer;
+}
+.delete-btn:hover {
+  color: #a71d2a;
+}
+.back-btn {
+  background: #2e7d32;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px; 
+  transition: background 0.3s;
+}
+
+.back-btn:hover {
+  background: #2e7d32;
+}
+
+
+  </style>
+</head>
+<body>
+
+  <h2>My Requests</h2>
+
+  <button class="back-btn" onclick="window.location.href='buyer_dashboard.html'">⬅ Back</button>
+  <div class="search-bar">
+    <input type="text" placeholder="Search requests...">
+    <button><i class="fas fa-search"></i></button>
+  </div>
+
+  <div class="filters">
+    <select>
+      <option>All Crops</option>
+      <option>Tomatoes</option>
+      <option>Onions</option>
+      <option>Wheat</option>
+    </select>
+
+    <select>
+      <option>All Status</option>
+      <option>Active</option>
+      <option>Pending</option>
+      <option>Expired</option>
+    </select>
+
+    <select>
+      <option>All Locations</option>
+      <option>Pune</option>
+      <option>Nashik</option>
+      <option>Jaipur</option>
+    </select>
+  </div>
+
+  <div class="grid-container">
+    <div class="card">
+      <h3>Tomatoes</h3>
+      <p>Quantity: 200kg | Location: Pune</p>
+      <span class="status active">Active</span>
+      <button class="delete-btn"><i class="fas fa-trash"></i></button>
+    </div>
+
+    <div class="card">
+      <h3>Onions</h3>
+      <p>Quantity: 100kg | Location: Nashik</p>
+      <span class="status pending">Pending</span>
+      <button class="delete-btn"><i class="fas fa-trash"></i></button>
+    </div>
+
+    <div class="card">
+      <h3>Wheat</h3>
+      <p>Quantity: 500kg | Location: Jaipur</p>
+      <span class="status expired">Expired</span>
+      <button class="delete-btn"><i class="fas fa-trash"></i></button>
+    </div>
+  </div>
+
+</body>
+</html>
