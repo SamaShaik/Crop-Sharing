@@ -43,12 +43,6 @@ The platform ensures **direct communication**, **fair pricing**, and **role-base
 **Authentication**
 - JWT (JSON Web Tokens)
 ## ▶️ How to Run the Project
-
-### Prerequisites
-- Node.js
-- MySQL
-- Web Browser
-
 ### Steps
 1. Clone the repository:
 git clone https://github.com/samashaik/crop-sharing.git
@@ -57,9 +51,10 @@ git clone https://github.com/samashaik/crop-sharing.git
 CREATE DATABASE crop_marketplace;
 
 3. Start backend:
-cd backend
-npm install
-node server.js
+   ```bash
+   cd backend
+   npm install
+   node server.js
 
 4. Open frontend:
 Open login.html or register.html in browser
