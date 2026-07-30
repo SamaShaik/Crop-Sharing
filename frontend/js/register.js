@@ -12,8 +12,16 @@ registerForm.addEventListener('submit', async (e) => {
   const village = document.getElementById('village').value;
   const farmSize = document.getElementById('farmSize').value;
   const role = document.querySelector('.role-btn.active').textContent.toLowerCase();
-  
+  if (!/^\d{10}$/.test(phone)) {
+    alert("Phone number must contain exactly 10 digits.");
+    return;
+  }
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 
+  if (!emailRegex.test(email)) {
+    alert("Please enter a valid email address.");
+    return;
+  }
   const payload = { name, email, password, phone, country, state, village, role };
   if (role === 'farmer') payload.farmSize = farmSize;
   try {

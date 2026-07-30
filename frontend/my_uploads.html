@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Uploads</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/farmer-dashboard.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+
+<header>
+    <h2>My Uploaded Crops</h2>
+
+    <button class="btn back-btn"
+            onclick="window.location.href='farmer_dashboard.html'">
+        ⬅ Back to Dashboard
+    </button>
+</header>
+
+<div class="container">
+
+    <h3>My Uploaded Crops</h3>
+
+    <div class="crop-grid" id="uploadsList"></div>
+
+</div>
+
+<script>
+const API_URL = "http://localhost:3000/api";
+
+const token = localStorage.getItem("token");
+
+if (!token)
+    window.location.href = "login.html";
+
+async function fetchFarmerCrops() {
+
+    const res = await fetch(`${API_URL}/crops/farmer`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+    const data = await res.json();
+
+    const list = document.getElementById("uploadsList");
+
+    list.innerHTML = "";
+
+    data.forEach(c => {
+
+        list.innerHTML += `
+
+        <div class="card crop-card">
+
+            <img
+                src="${
+                    c.image
+                    ? `http://localhost:3000/${c.image}`
+                    : "https://via.placeholder.com/300x200?text=No+Image"
+                }"
+                class="crop-image"
+            >
+
+            <h3>${c.crop_name}</h3>
+
+            <p><strong>Quantity:</strong> ${c.quantity} kg</p>
+
+            <p><strong>Price:</strong> ₹${c.price}/kg</p>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+fetchFarmerCrops();
+</script>
+
+</body>
+</html>

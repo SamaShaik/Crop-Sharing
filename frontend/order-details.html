@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Order Details</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/order-details.css">
+
+
+
+</head>
+
+<body>
+
+<div class="page-header">
+
+    <button class="back-btn" onclick="history.back()">
+        ← Back
+    </button>
+
+</div>
+
+<div class="order-details-card">
+
+    <h2 id="cropName"></h2>
+
+    <p><strong>Farmer:</strong> <span id="farmer"></span></p>
+
+    <p><strong>Quantity:</strong> <span id="quantity"></span></p>
+
+    <p><strong>Crop Cost:</strong> ₹<span id="cropCost"></span></p>
+
+    <p><strong>Transport Cost:</strong> ₹<span id="transportCost"></span></p>
+
+    <p><strong>Total Amount:</strong> ₹<span id="totalAmount"></span></p>
+
+    <p><strong>Transport:</strong> <span id="transport"></span></p>
+
+    <p><strong>Destination:</strong></p>
+
+    <p id="destination"></p>
+
+    <p>
+        <strong>Status:</strong>
+        <span id="status" class="status-badge"></span>
+    </p>
+
+    <div
+        id="reviewSection"
+        class="review-section hidden"
+    >
+
+        <div id="writeReview">
+
+            <h3>Write Review</h3>
+
+            <div id="starRating" style="font-size:30px;cursor:pointer;">
+
+                <span data-value="1">☆</span>
+                <span data-value="2">☆</span>
+                <span data-value="3">☆</span>
+                <span data-value="4">☆</span>
+                <span data-value="5">☆</span>
+
+            </div>
+
+            <textarea
+                id="review"
+                placeholder="Share your experience..."
+            ></textarea>
+
+            <button class="submit-btn">
+
+                Submit Review
+
+            </button>
+
+        </div>
+
+    <div
+        id="myReview"
+        class="hidden"
+    >
+
+        <h3>Your Review</h3>
+
+        <p>
+
+            <strong>Rating:</strong>
+
+            <span id="myRating"></span>
+
+        </p>
+
+        <p>
+
+            <strong>Review:</strong>
+
+        </p>
+
+        <p id="myReviewText"></p>
+
+        <p>
+
+            <strong>Reviewed On:</strong>
+
+            <span id="myReviewDate"></span>
+
+        </p>
+
+    </div>
+
+</div>
+
+</div>
+
+<script src="js/order-details.js"></script>
+
+</body>
+</html>

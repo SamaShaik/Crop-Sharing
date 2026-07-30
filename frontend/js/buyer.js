@@ -1,10 +1,21 @@
+let allCrops = [];
 const buyer = JSON.parse(localStorage.getItem('user'));
 const buyerId = buyer ? buyer.id : 1;
 const buyerName = buyer ? buyer.name : "Buyer Name";
 
 document.getElementById("buyerName").innerText = buyerName;
-const profileInfo = document.querySelector("#profileInfo");
-if(profileInfo) profileInfo.querySelector("p").innerHTML = `<strong>Name:</strong> ${buyerName}`;
+const profileInfo = document.getElementById("profileInfo");
+
+if (profileInfo && buyer) {
+
+    profileInfo.innerHTML = `
+        <p><strong>Name:</strong> ${buyer.name}</p>
+        <p><strong>Email:</strong> ${buyer.email}</p>
+        <p><strong>State:</strong> ${buyer.state}</p>
+        <p><strong>Village:</strong> ${buyer.village}</p>
+    `;
+
+}
 
 function toggleProfile() {
   document.getElementById("profileInfo").classList.toggle("hidden");
@@ -15,180 +26,270 @@ async function fetchAvailableCrops() {
     const res = await fetch('http://localhost:3000/api/crops');
     if (!res.ok) throw new Error("Failed to fetch crops");
     const data = await res.json();
-    renderAvailableCrops(data);
+    allCrops = data;
+    loadStateFilter(allCrops);
+    renderAvailableCrops(allCrops);
   } catch (err) {
     console.error("Error fetching crops:", err);
   }
 }
 
+
+
+
 function renderAvailableCrops(cropsList) {
-  const container = document.getElementById("cropsList");
-  container.innerHTML = "";
 
-  cropsList.forEach(c => {
-    const card = document.createElement("div");
-    card.className = "grid-card";
-    card.innerHTML = `
-      <strong>${c.crop_name}</strong>
-      <p>Quantity: ${c.quantity}</p>
-      <p>₹${c.price}/kg</p>
-      <p>State: ${c.state}</p>
-      <p>Farmer: ${c.farmer_name}</p>
-      <a href="#" onclick="showFarmerDetails(${c.farmer_id})">More details</a>
-    `;
+    const container = document.getElementById("cropsList");
 
-    const btn = document.createElement("button");
-    btn.textContent = "Request";
-    btn.onclick = () => sendRequest(c);
-    card.appendChild(btn);
-
-    container.appendChild(card);
-  });
-}
-
-async function sendRequest(crop) {
-  const offer = prompt(`Enter your price per kg (Farmer price: ₹${crop.price}):`, crop.price);
-  if (!offer) return;
-
-  try {
-    const res = await fetch('http://localhost:3000/api/requests/add', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem("token")}`
-      },
-      body: JSON.stringify({
-        crop_id: crop.id,
-        quantity: crop.quantity,
-        requested_price: offer
-      })
-    });
-
-
-    if (!res.ok) {
-      const errText = await res.text(); 
-      let msg;
-      try { msg = JSON.parse(errText).error; } catch { msg = errText; }
-      throw new Error(msg || "Failed to send request");
-    }
-
-    const result = await res.json();
-    alert(result.message || "Request sent successfully!");
-    fetchMyRequests();
-
-  } catch (err) {
-    console.error(err);
-    alert("Error sending request: " + err.message);
-  }
-}
-
-async function fetchMyRequests() {
-  try {
-    const res = await fetch(`http://localhost:3000/api/requests/${buyerId}`);
-    if (!res.ok) throw new Error("Failed to fetch requests");
-    const data = await res.json();
-
-    const container = document.getElementById("myRequestsList");
     container.innerHTML = "";
 
-    data.forEach(r => {
-      const card = document.createElement("div");
-      card.className = "grid-card";
-      card.innerHTML = `
-        <strong>${r.crop_name}</strong>
-        <p>Offered Price: ₹${r.requested_price}/kg</p>
-        <p>Farmer: ${r.farmer_name}</p>
+    if (cropsList.length === 0) {
 
-        <p>
-          Status:
-          <span style="
-            font-weight:600;
-            color:${
-              r.status === 'accepted'
-                ? 'green'
-                : r.status === 'rejected'
-                ? 'red'
-                : 'orange'
+        container.innerHTML = `
+            <h3 style="text-align:center;">
+                No crops found.
+            </h3>
+        `;
+
+        return;
+
+    }
+
+    cropsList.forEach(c => {
+
+        const card = document.createElement("div");
+
+        card.className = "grid-card";
+
+       card.innerHTML = `
+
+            <img
+                src="${c.image
+                    ? `http://localhost:3000/${c.image}`
+                    : 'https://via.placeholder.com/300x200?text=No+Image'}"
+                alt="${c.crop_name}"
+                class="crop-image"
+            >
+
+            <h3>${c.crop_name}</h3>
+
+            <p><strong>Quantity:</strong> ${c.quantity} kg</p>
+
+            <p><strong>Price:</strong> ₹${c.price}/kg</p>
+
+            <p>
+                <strong>Rating:</strong>
+                ${"★".repeat(Math.round(Number(c.average_rating || 0)))}
+                ${"☆".repeat(5 - Math.round(Number(c.average_rating || 0)))}
+                (${c.total_reviews || 0} Reviews)
+            </p>
+
+            <p class="${
+                Number(c.quantity) > 0
+                    ? "available"
+                    : "out-of-stock"
+            }">
+                ${
+                    Number(c.quantity) > 0
+                        ? "Available"
+                        : "Out of Stock"
+                }
+            </p>
+
+        `;
+
+        const detailsBtn = document.createElement("button");
+
+        detailsBtn.textContent =
+            Number(c.quantity) > 0
+                ? "View Details"
+                : "Out of Stock";
+
+        detailsBtn.disabled =
+            Number(c.quantity) <= 0;
+
+        if (Number(c.quantity) > 0) {
+
+            detailsBtn.onclick = () => {
+
+                window.location.href = `crop_details.html?id=${c.id}`;
+
             };
-          ">
-            ${r.status}
-          </span>
-        </p>
 
-        <a href="#" onclick="showFarmerDetails(${r.farmer_id})">
-          More details
-        </a>
-      `;
+        }
 
+        const reviewBtn = document.createElement("button");
 
-      const deleteBtn = document.createElement("button");
-      deleteBtn.innerHTML = `<i class="fas fa-trash"></i>`;
-      deleteBtn.onclick = () => deleteRequest(r.id);
+        reviewBtn.textContent = "View Reviews";
 
-      card.appendChild(deleteBtn);
-      container.appendChild(card);
+        const reviewsDiv = document.createElement("div");
+
+        reviewsDiv.style.display = "none";
+
+        reviewBtn.onclick = async () => {
+
+            if (reviewsDiv.style.display === "block") {
+
+                reviewsDiv.style.display = "none";
+
+                reviewBtn.textContent = "View Reviews";
+
+                return;
+
+            }
+
+            reviewBtn.textContent = "Hide Reviews";
+
+            try {
+                console.log("Farmer ID:", c.farmer_id);
+                console.log("Crop Name:", c.crop_name);
+
+                const res = await fetch(
+
+                    `http://localhost:3000/api/reviews/crop/${c.farmer_id}/${encodeURIComponent(c.crop_name)}`
+
+                );
+
+                const reviews = await res.json();
+
+                if (reviews.length === 0) {
+
+                    reviewsDiv.innerHTML = `
+                        <p>No reviews yet.</p>
+                    `;
+
+                }
+
+                else {
+
+                    reviewsDiv.innerHTML = reviews.map(r => `
+
+                        <div style="
+                            border-top:1px solid #ddd;
+                            margin-top:10px;
+                            padding-top:10px;
+                        ">
+
+                            <strong>
+                                ${"★".repeat(r.rating)}
+                                ${"☆".repeat(5-r.rating)}
+                            </strong>
+
+                            <p><b>${r.buyer_name}</b></p>
+
+                           
+
+                            <p>${r.review}</p>
+
+                        </div>
+
+                    `).join("");
+
+                }
+
+                reviewsDiv.style.display = "block";
+
+            }
+
+            catch(err){
+
+                console.error(err);
+
+                alert("Unable to load reviews.");
+
+            }
+
+        };
+
+        const buttonContainer = document.createElement("div");
+        buttonContainer.className = "card-buttons";
+
+        buttonContainer.appendChild(detailsBtn);
+        buttonContainer.appendChild(reviewBtn);
+
+        card.appendChild(buttonContainer);
+        card.appendChild(reviewsDiv);
+
+        container.appendChild(card);
     });
-  } catch (err) {
-    console.error("Error fetching requests:", err);
-    alert("Error fetching your requests. Please try again later.");
-  }
+
+}
+function loadStateFilter(cropsList) {
+
+    const filter = document.getElementById("filterState");
+
+    filter.innerHTML = `<option value="">All States</option>`;
+
+    const states = [
+        ...new Set(
+            cropsList
+                .map(c => c.state)
+                .filter(state => state)
+        )
+    ];
+
+    states.sort();
+
+    states.forEach(state => {
+
+        const option = document.createElement("option");
+
+        option.value = state;
+
+        option.textContent = state;
+
+        filter.appendChild(option);
+
+    });
+
 }
 
-async function deleteRequest(id) {
-  if (!confirm("Are you sure you want to delete this request?")) return;
 
-  try {
-    const res = await fetch(`http://localhost:3000/api/requests/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error("Failed to delete request");
-    const result = await res.json();
-    alert(result.message || "Request deleted");
-    fetchMyRequests();
-  } catch (err) {
-    console.error(err);
-    alert("Error deleting request: " + err.message);
-  }
+function applyFilters() {
+
+    const search = document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+    const state = document
+        .getElementById("filterState")
+        .value;
+
+    const sort = document
+        .getElementById("sortPrice")
+        .value;
+
+    let filtered = allCrops.filter(crop => {
+
+        const matchesSearch =
+            crop.crop_name.toLowerCase().includes(search);
+
+        const matchesState =
+            state === "" || crop.state === state;
+
+        return matchesSearch && matchesState;
+
+    });
+
+    if (sort === "low") {
+
+        filtered.sort((a, b) => Number(a.price) - Number(b.price));
+
+    }
+
+    else if (sort === "high") {
+
+        filtered.sort((a, b) => Number(b.price) - Number(a.price));
+
+    }
+
+    renderAvailableCrops(filtered);
+
 }
 
-function showSection(sectionId) {
-  document.getElementById("dashboard").classList.add("hidden");
-  document.querySelectorAll(".fullView").forEach(s => s.classList.add("hidden"));
-  document.getElementById(sectionId).classList.remove("hidden");
 
-  if (sectionId === "myRequestsSection") fetchMyRequests();
-}
 
-function goBack() {
-  document.getElementById("dashboard").classList.remove("hidden");
-  document.querySelectorAll(".fullView").forEach(s => s.classList.add("hidden"));
-}
-
-// Filters
-document.getElementById("searchInput").addEventListener("input", applyFilters);
-document.getElementById("filterState").addEventListener("change", applyFilters);
-document.getElementById("priceFilter").addEventListener("change", applyFilters);
-
-// Apply search & filters
-async function applyFilters() {
-  try {
-    const res = await fetch('http://localhost:3000/api/crops');
-    if (!res.ok) throw new Error("Failed to fetch crops");
-    let cropsList = await res.json();
-
-    const searchText = document.getElementById("searchInput").value.toLowerCase();
-    const state = document.getElementById("filterState").value;
-    const priceSort = document.getElementById("priceFilter").value;
-
-    if (searchText) cropsList = cropsList.filter(c => c.crop_name.toLowerCase().includes(searchText));
-    if (state) cropsList = cropsList.filter(c => c.state === state);
-    if (priceSort === "lowToHigh") cropsList.sort((a, b) => a.price - b.price);
-    if (priceSort === "highToLow") cropsList.sort((a, b) => b.price - a.price);
-
-    renderAvailableCrops(cropsList);
-
-  } catch (err) {
-    console.error("Error applying filters:", err);
-  }
-}
 
 // Logout
 function logout() {
@@ -200,7 +301,6 @@ function logout() {
 
 // Initial fetch
 fetchAvailableCrops();
-fetchMyRequests();
 async function showFarmerDetails(farmerId) {
   try {
     const res = await fetch(`http://localhost:3000/api/users/farmer/${farmerId}`);
@@ -224,3 +324,104 @@ async function showFarmerDetails(farmerId) {
     alert("Error loading farmer details");
   }
 }
+async function calculateTransport(crop){
+
+    const vehicle = document.querySelector(
+        `input[name="transport_${crop.id}"]:checked`
+    )?.value;
+
+    const destinationCity =
+        document.getElementById(`city_${crop.id}`).value;
+
+    if(!vehicle){
+        alert("Please select a transport.");
+        return;
+    }
+
+    if(!destinationCity){
+        alert("Please select destination city.");
+        return;
+    }
+
+    try{
+
+        const res = await fetch(
+            "http://localhost:3000/api/transport/calculate",
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+
+                    source_city: crop.source_city,
+
+                    destination_city: destinationCity,
+
+                    vehicle: vehicle
+
+                })
+
+            }
+        );
+
+        const data = await res.json();
+
+        if(!res.ok){
+
+            alert(data.error);
+
+            return;
+
+        }
+
+        const cropCost =
+            parseFloat(crop.price) *
+            parseFloat(crop.quantity);
+
+        const total =
+            cropCost +
+            data.transportCost;
+
+        document.getElementById(`result_${crop.id}`).innerHTML = `
+
+            <hr>
+
+            <p><strong>Distance:</strong> ${data.distance} KM</p>
+
+            <p><strong>Rate:</strong> ₹${data.rate}/KM</p>
+
+            <p><strong>Toll:</strong> ₹${data.toll}</p>
+
+            <p><strong>Base Charge:</strong> ₹${data.base}</p>
+
+            <p><strong>Transport Cost:</strong> ₹${data.transportCost}</p>
+
+            <h3>Total Cost : ₹${total}</h3>
+
+        `;
+
+    }
+
+    catch(err){
+
+        console.error(err);
+
+        alert("Server Error");
+
+    }
+
+}
+document
+    .getElementById("searchInput")
+    .addEventListener("input", applyFilters);
+
+document
+    .getElementById("filterState")
+    .addEventListener("change", applyFilters);
+
+document
+    .getElementById("sortPrice")
+    .addEventListener("change", applyFilters);

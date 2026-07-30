@@ -1,0 +1,44 @@
+/* =========================================
+   Order Details Page
+========================================= */
+
+.order-details-card{
+    max-width:900px;
+    margin:20px auto 40px;
+    background:#fff;
+    padding:35px 45px;
+    border-radius:20px;
+    box-shadow:0 8px 25px rgba(0,0,0,.08);
+}
+
+.order-details-card h2{
+    margin:0 0 25px;
+    color:#2e7d32;
+    font-size:30px;
+    font-weight:600;
+}
+
+.order-details-card p{
+    margin:14px 0;
+    font-size:16px;
+    line-height:1.7;
+    color:#444;
+}
+
+.order-details-card strong{
+    color:#222;
+    min-width:150px;
+    display:inline-block;
+}
+
+#destination{
+    background:#f8faf8;
+    border:1px solid #dfe8df;
+    border-radius:10px;
+    padding:12px;
+    margin-top:8px;
+}
+
+.hidden{
+    display:none;
+}

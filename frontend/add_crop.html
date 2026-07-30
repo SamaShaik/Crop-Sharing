@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Crop</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <link rel="stylesheet" href="css/add_crop.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>
+            <i class="fa-solid fa-seedling"></i>
+            Add New Crop
+        </h2>
+
+        <form id="addCropForm">
+
+            <label>Crop Name</label>
+            <input
+                type="text"
+                id="crop"
+                placeholder="Enter crop name"
+                required
+            >
+
+            <label>Quantity</label>
+            <input
+                type="text"
+                id="qty"
+                placeholder="Example: 100 kg"
+                required
+            >
+
+            <label>Price (per kg)</label>
+            <input
+                type="number"
+                id="price"
+                placeholder="Enter price"
+                required
+            >
+
+
+            <label>Crop Image</label>
+
+            <input
+                type="file"
+                id="image"
+                accept="image/*"
+            >
+            <textarea
+                id="details"
+                rows="4"
+                placeholder="Organic, freshly harvested, etc."
+            ></textarea>
+
+            <label>Farm Address</label>
+
+            <input
+                type="text"
+                id="farmAddress"
+                placeholder="Search your farm location..."
+                autocomplete="off"
+                required
+            >
+
+            <!-- Suggestions -->
+
+            <div id="addressSuggestions" class="suggestions"></div>
+
+            <!-- Hidden Coordinates -->
+
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+
+            <!-- Map -->
+
+            <label>Available Transport</label>
+
+            <div class="transport-grid">
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="transport"
+                        value="Truck"
+                    >
+                    Truck
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="transport"
+                        value="Lorry"
+                    >
+                    Lorry
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="transport"
+                        value="Tractor"
+                    >
+                    Tractor
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="transport"
+                        value="Van"
+                    >
+                    Van
+                </label>
+
+                <label>
+                    <input
+                        type="checkbox"
+                        name="transport"
+                        value="Auto"
+                    >
+                    Auto
+                </label>
+
+            </div>
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                >
+                    Save Crop
+                </button>
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    onclick="window.location.href='farmer_dashboard.html'"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<script src="js/add_crop.js"></script>
+
+</body>
+</html>

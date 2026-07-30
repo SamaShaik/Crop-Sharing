@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Orders</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/farmer-dashboard.css">
+    <link rel="stylesheet" href="css/common.css">
+</head>
+<body>
+
+<header>
+    <h2>Orders</h2>
+
+    <button class="btn back-btn"
+            onclick="window.location.href='farmer_dashboard.html'">
+        ⬅ Back to Dashboard
+    </button>
+</header>
+
+<div class="container">
+
+    <h3>Customer Orders</h3>
+
+    <div class="crop-grid" id="ordersList"></div>
+
+</div>
+
+<script>
+const API_URL = "http://localhost:3000/api";
+
+const user = JSON.parse(localStorage.getItem("user"));
+const token = localStorage.getItem("token");
+
+if (!user || !token)
+    window.location.href = "login.html";
+
+async function fetchFarmerOrders() {
+
+    try {
+
+        const res = await fetch(
+            `${API_URL}/orders/farmer/${user.id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Failed to load orders");
+            return;
+        }
+
+        renderFarmerOrders(data);
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+function renderFarmerOrders(orders) {
+
+    const container = document.getElementById("ordersList");
+
+    container.innerHTML = "";
+
+    if (orders.length === 0) {
+        container.innerHTML = "<p>No orders found.</p>";
+        return;
+    }
+
+    orders.forEach(order => {
+
+        container.innerHTML += `
+
+        <div class="card">
+
+            <strong>${order.crop_name}</strong>
+
+            <p>Buyer: ${order.buyer_name}</p>
+
+            <p>Quantity: ${order.quantity} kg</p>
+
+            <p>Crop Cost: ₹${order.crop_price}</p>
+
+            <p>Transport Cost: ₹${order.transport_cost}</p>
+
+            <p>Total Amount: ₹${order.total_amount}</p>
+
+            <p>Transport: ${order.transport_type}</p>
+
+            <p>
+                <strong>Status:</strong>
+
+                <span class="status ${
+                    order.order_status === "Pending" ? "pending" :
+                    order.order_status === "Accepted" ? "accepted" :
+                    order.order_status === "Rejected" ? "rejected" :
+                    order.order_status === "In Transit" ? "transit" :
+                    "delivered"
+                }">
+
+                    ${order.order_status}
+
+                </span>
+
+            </p>
+
+            ${
+                order.order_status === "Pending"
+                ? `
+                <button style="background:green"
+                        onclick="updateOrderStatus(${order.id}, 'Accepted')">
+                    Accept
+                </button>
+
+                <button style="background:red"
+                        onclick="updateOrderStatus(${order.id}, 'Rejected')">
+                    Reject
+                </button>
+                `
+                : order.order_status === "Accepted"
+                ? `
+                <button style="background:#1976d2"
+                        onclick="updateOrderStatus(${order.id}, 'In Transit')">
+                    Mark In Transit
+                </button>
+                `
+                : order.order_status === "In Transit"
+                ? `
+                <button style="background:#2e7d32"
+                        onclick="updateOrderStatus(${order.id}, 'Delivered')">
+                    Mark Delivered
+                </button>
+                `
+                : ""
+            }
+
+        </div>
+
+        `;
+    });
+}
+
+async function updateOrderStatus(orderId, status) {
+
+    try {
+
+        const res = await fetch(
+            `${API_URL}/orders/${orderId}/status`,
+            {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message);
+            return;
+        }
+
+        alert(data.message);
+
+        fetchFarmerOrders();
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+fetchFarmerOrders();
+</script>
+
+</body>
+</html>

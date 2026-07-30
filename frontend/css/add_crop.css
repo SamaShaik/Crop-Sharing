@@ -1,0 +1,164 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:#f4f8f5;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    min-height:100vh;
+    padding:40px 20px;
+}
+
+.container{
+    width:100%;
+    max-width:750px;
+}
+
+.card{
+    background:#fff;
+    padding:35px;
+    border-radius:15px;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+
+.card h2{
+    color:#2e7d32;
+    text-align:center;
+    margin-bottom:30px;
+}
+
+label{
+    display:block;
+    margin-top:18px;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#333;
+}
+
+input,
+textarea{
+    width:100%;
+    padding:12px 15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+    font-size:15px;
+    transition:.3s;
+}
+
+input:focus,
+textarea:focus{
+    border-color:#2e7d32;
+}
+
+textarea{
+    resize:vertical;
+}
+
+.transport-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:15px;
+}
+
+.transport-grid label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:#f7f7f7;
+    border-radius:8px;
+    padding:12px;
+    cursor:pointer;
+    font-weight:500;
+}
+
+.transport-grid input{
+    width:auto;
+}
+
+.buttons{
+    display:flex;
+    gap:15px;
+    margin-top:30px;
+}
+
+.buttons button{
+    flex:1;
+    padding:14px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.save-btn{
+    background:#2e7d32;
+    color:white;
+}
+
+.save-btn:hover{
+    background:#1b5e20;
+}
+
+.cancel-btn{
+    background:#e53935;
+    color:white;
+}
+
+.cancel-btn:hover{
+    background:#c62828;
+}
+
+/* Address Suggestions */
+
+.suggestions{
+    border:1px solid #ddd;
+    border-top:none;
+    max-height:220px;
+    overflow-y:auto;
+    background:white;
+    border-radius:0 0 8px 8px;
+    display:none;
+    position:relative;
+    z-index:1000;
+}
+
+.suggestion-item{
+    padding:12px;
+    cursor:pointer;
+    border-bottom:1px solid #eee;
+}
+
+.suggestion-item:hover{
+    background:#f1f1f1;
+}
+
+/* Map */
+
+
+
+/* Responsive */
+
+@media(max-width:768px){
+
+    .card{
+        padding:20px;
+    }
+
+    .transport-grid{
+        grid-template-columns:1fr;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+
+}

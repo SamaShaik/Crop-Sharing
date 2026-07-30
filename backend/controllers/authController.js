@@ -11,6 +11,19 @@ exports.register = (req, res) => {
   if (!name || !email || !password || !phone || !role) {
     return res.status(400).json({ message: 'All required fields must be provided' });
   }
+  const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({
+      message: "Please enter a valid email address."
+    });
+  }
+
+  if (!/^\d{10}$/.test(phone)) {
+    return res.status(400).json({
+      error: "Phone number must contain exactly 10 digits."
+    });
+  }
 
   // Hash password
   const hashedPassword = bcrypt.hashSync(password, 10);
@@ -44,7 +57,12 @@ exports.login = (req, res) => {
   const { email, password, role } = req.body;
 
   User.findByEmail(email, (err, users) => {
-    if (err) return res.status(500).json({ message: 'Server error' });
+    if (err) {
+    console.error("Login DB Error:", err);
+    return res.status(500).json({
+        error: err.message
+    });
+}
 
     if (!users.length) {
       return res.status(404).json({ message: 'User not found' });
